@@ -2672,42 +2672,49 @@ function! s:app_routes() dict abort
     let routes = []
     let paths = {}
     let binding = self.server_binding()
-    if len(binding) && len(s:webcat())
-      let html = system(s:webcat() . ' ' . shellescape('http://' . binding . '/rails/info/routes'))
-      for line in split(matchstr(html, '.*<tbody>\zs.*\ze</tbody>'), "\n")
-        let val = matchstr(line, '\C<td data-route-name=''\zs[^'']*''\ze>')
-        if len(val)
-          if len(routes) && len(routes[-1]) < 4
-            call remove(routes, -1)
-          endif
-          call add(routes, {'name': val[0:-2]})
-        endif
-        if empty(routes)
-          continue
-        endif
-        let val = matchstr(line, '\C<td data-route-path=''\zs[^'']*\ze''>')
-        if len(val)
-          let routes[-1].path = val
-          if empty(routes[-1].name)
-            let routes[-1].name = get(paths, val, '')
-          else
-            let paths[val] = routes[-1].name
-          endif
-        endif
-        let val = matchstr(line, '\C^\s*\zs[[:upper:]|]\+')
-        if len(val)
-          let routes[-1].method = val
-        endif
-        let val = matchstr(line, '\C<p>\zs\%(redirect(.\{-\})\|\S\+#[^ #<]\+\)')
-        if len(val)
-          let routes[-1].handler = val
-        endif
-      endfor
-    endif
+    " if len(binding) && len(s:webcat())
+    "   let html = system(s:webcat() . ' ' . shellescape('http://' . binding . '/rails/info/routes'))
+    "   for line in split(matchstr(html, '.*<tbody>\zs.*\ze</tbody>'), "\n")
+    "     let val = matchstr(line, '\C<td data-route-name=''\zs[^'']*''\ze>')
+    "     if len(val)
+    "       if len(routes) && len(routes[-1]) < 4
+    "         call remove(routes, -1)
+    "       endif
+    "       call add(routes, {'name': val[0:-2]})
+    "     endif
+    "     if empty(routes)
+    "       continue
+    "     endif
+    "     let val = matchstr(line, '\C<td data-route-path=''\zs[^'']*\ze''>')
+    "     if len(val)
+    "       let routes[-1].path = val
+    "       if empty(routes[-1].name)
+    "         let routes[-1].name = get(paths, val, '')
+    "       else
+    "         let paths[val] = routes[-1].name
+    "       endif
+    "     endif
+    "     let val = matchstr(line, '\C^\s*\zs[[:upper:]|]\+')
+    "     if len(val)
+    "       let routes[-1].method = val
+    "     endif
+    "     let val = matchstr(line, '\C<p>\zs\%(redirect(.\{-\})\|\S\+#[^ #<]\+\)')
+    "     if len(val)
+    "       let routes[-1].handler = val
+    "     endif
+    "   endfor
+    " endif
     if empty(routes)
       try
         execute cd fnameescape(self.real())
-        let output = system(self.rake_command().' routes')
+        " let output = system(self.rake_command().' routes')
+
+        " g:routes_cache_file: set result of command what 'rake routes'
+        if exists('g:routes_cache_file')
+          let output = system('cat' . ' ' . g:routes_cache_file)
+        else
+          let output = ''
+        endif
       finally
         execute cd fnameescape(cwd)
       endtry
