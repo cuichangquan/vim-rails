@@ -4822,9 +4822,17 @@ function! s:map_gf() abort
     nmap <buffer><silent> gf         <SID>:find <Plug><cfile><CR>
     let b:undo_ftplugin .= "|sil! exe 'nunmap <buffer> gf'"
   endif
+  if mapcheck('<F9>', 'n') =~# pattern
+    nmap <buffer><silent> <F9>         <SID>:vertical sfind <Plug><cfile><CR>
+    let b:undo_ftplugin .= "|sil! exe 'nunmap <buffer> <F9>'"
+  endif
   if mapcheck('<C-W>f', 'n') =~# pattern
     nmap <buffer><silent> <C-W>f     <SID>:sfind <Plug><cfile><CR>
     let b:undo_ftplugin .= "|sil! exe 'nunmap <buffer> <C-W>f'"
+  endif
+  if mapcheck('<F7>', 'n') =~# pattern
+    nmap <buffer><silent> <F7>     <SID>:sfind <Plug><cfile><CR>
+    let b:undo_ftplugin .= "|sil! exe 'nunmap <buffer> <F7>"
   endif
   if mapcheck('<C-W><C-F>', 'n') =~# pattern
     nmap <buffer><silent> <C-W><C-F> <SID>:sfind <Plug><cfile><CR>
